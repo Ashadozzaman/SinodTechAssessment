@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\RoleController;
+use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
@@ -10,10 +11,13 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    $totalUser = User::get()->count();
+    return Inertia::render('Dashboard', [
+        'totalUser' => $totalUser
+    ]);
+})->middleware(['auth', 'verified', 'prevent_back'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'prevent_back')->group(function () {
     //** User Route Start */
     Route::resource('users', UserController::class)
         ->only(['create', 'store'])
