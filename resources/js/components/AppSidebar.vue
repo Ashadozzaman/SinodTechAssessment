@@ -5,7 +5,7 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { Building2, LayoutGrid, Notebook, Package, UserRound, Users } from 'lucide-vue-next';
+import { Building2, LayoutGrid, Notebook, Package, ShoppingCart, UserRound, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -43,6 +43,12 @@ const mainNavItems: NavItem[] = [
         href: '/customers',
         icon: UserRound,
         permission: 'customers.view',
+    },
+    {
+        title: 'Sales',
+        href: '/sales',
+        icon: ShoppingCart,
+        permission: 'sales.view',
     },
 ];
 

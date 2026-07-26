@@ -28,6 +28,10 @@ class RoleSeeder extends Seeder
             'customers.create',
             'customers.update',
             'customers.delete',
+            'sales.view',
+            'sales.create',
+            'sales.update',
+            'sales.delete',
         ]);
 
         $employee = Role::firstOrCreate(['name' => 'Employee']);
@@ -35,6 +39,8 @@ class RoleSeeder extends Seeder
             'products.view',
             'branches.view',
             'customers.view',
+            'sales.view',
+            'sales.create',
         ]);
     }
 }

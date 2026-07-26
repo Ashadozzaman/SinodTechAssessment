@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
@@ -102,6 +103,21 @@ Route::middleware('auth', 'prevent_back')->group(function () {
         ->name('inventory.adjust')
         ->middleware("permission:inventory.adjust");
     //** Inventory Route End */
+
+    //** Sales Route Start */
+    Route::get('sales/search-customers', [SaleController::class, 'searchCustomers'])
+        ->name('sales.search-customers')
+        ->middleware("permission:sales.create");
+    Route::get('sales/search-products', [SaleController::class, 'searchProducts'])
+        ->name('sales.search-products')
+        ->middleware("permission:sales.create");
+    Route::resource('sales', SaleController::class)
+        ->only(['create', 'store'])
+        ->middleware("permission:sales.create");
+    Route::resource('sales', SaleController::class)
+        ->only(['index', 'show'])
+        ->middleware("permission:sales.view|sales.create|sales.update|sales.delete");
+    //** Sales Route End */
 });
 
 require __DIR__ . '/settings.php';

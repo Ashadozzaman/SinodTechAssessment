@@ -43,6 +43,44 @@ export interface ProductStockRow {
     quantity: number;
 }
 
+export interface CustomerSearchResult {
+    id: number;
+    name: string;
+    phone: string;
+    email: string | null;
+}
+
+export interface ProductSearchResult {
+    id: number;
+    name: string;
+    sku: string;
+    price: string;
+    available_stock: number;
+}
+
+export interface SaleItem {
+    id: number;
+    product_id: number;
+    product_name: string;
+    quantity: number;
+    unit_price: string;
+    subtotal: string;
+}
+
+export interface Sale {
+    id: number;
+    invoice_number: string;
+    customer?: { id: number; name: string };
+    branch?: { id: number; name: string };
+    cashier?: { id: number; name: string };
+    items?: SaleItem[];
+    total_amount: string;
+    status: 'completed' | 'refunded';
+    status_label: string;
+    sale_date: string;
+    created_at: string;
+}
+
 export interface PaginationLink {
     url: string | null;
     label: string;

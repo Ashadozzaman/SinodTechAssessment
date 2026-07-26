@@ -39,6 +39,11 @@ class Product extends Model
         return $this->hasMany(ProductStock::class);
     }
 
+    public function saleItems(): HasMany
+    {
+        return $this->hasMany(SaleItem::class);
+    }
+
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
         if (! $term) {
