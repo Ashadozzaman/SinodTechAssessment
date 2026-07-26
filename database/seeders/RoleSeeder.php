@@ -24,12 +24,17 @@ class RoleSeeder extends Seeder
             'products.delete',
             'branches.view',
             'inventory.adjust',
+            'customers.view',
+            'customers.create',
+            'customers.update',
+            'customers.delete',
         ]);
 
         $employee = Role::firstOrCreate(['name' => 'Employee']);
         $employee->syncPermissions([
             'products.view',
             'branches.view',
+            'customers.view',
         ]);
     }
 }

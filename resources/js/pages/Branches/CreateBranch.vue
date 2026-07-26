@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import FormField from '@/components/FormField.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
@@ -32,28 +33,10 @@ const form = useForm({
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-xl border md:min-h-min">
                 <div class="relative overflow-x-auto sm:rounded-lg">
                     <form @submit.prevent="form.post(route('branches.store'))" class="mx-auto my-10 max-w-md rounded-xl bg-white p-6 shadow-md">
-                        <div class="mb-4">
-                            <label class="mb-1 block">Name</label>
-                            <input v-model="form.name" type="text" class="w-full rounded border p-2" />
-                            <div v-if="form.errors.name" class="text-sm text-red-500">{{ form.errors.name }}</div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="mb-1 block">Address</label>
-                            <input v-model="form.address" type="text" class="w-full rounded border p-2" />
-                            <div v-if="form.errors.address" class="text-sm text-red-500">{{ form.errors.address }}</div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="mb-1 block">Phone</label>
-                            <input v-model="form.phone" type="text" class="w-full rounded border p-2" />
-                            <div v-if="form.errors.phone" class="text-sm text-red-500">{{ form.errors.phone }}</div>
-                        </div>
-
-                        <div class="mb-4 flex items-center">
-                            <input v-model="form.is_active" type="checkbox" class="form-checkbox h-4 w-4 rounded border" />
-                            <span class="ml-2 text-gray-800">Active</span>
-                        </div>
+                        <FormField v-model="form.name" label="Name" :error="form.errors.name" />
+                        <FormField v-model="form.address" label="Address" :error="form.errors.address" />
+                        <FormField v-model="form.phone" label="Phone" :error="form.errors.phone" />
+                        <FormField v-model="form.is_active" label="Active" type="checkbox" :error="form.errors.is_active" />
 
                         <button
                             type="submit"

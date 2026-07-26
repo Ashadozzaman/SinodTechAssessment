@@ -31,6 +31,10 @@ class PermissionSeeder extends Seeder
             "branches.update",
             "branches.delete",
             "inventory.adjust",
+            "customers.view",
+            "customers.create",
+            "customers.update",
+            "customers.delete",
         ];
 
         foreach ($permissions as $permission) {

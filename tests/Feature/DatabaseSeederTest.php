@@ -16,7 +16,7 @@ class DatabaseSeederTest extends TestCase
     {
         $this->seed();
 
-        $this->assertSame(17, Permission::count());
+        $this->assertSame(21, Permission::count());
         $this->assertTrue(Permission::where('name', 'users.view')->exists());
         $this->assertTrue(Permission::where('name', 'roles.delete')->exists());
         $this->assertTrue(Permission::where('name', 'products.view')->exists());
@@ -24,6 +24,8 @@ class DatabaseSeederTest extends TestCase
         $this->assertTrue(Permission::where('name', 'branches.view')->exists());
         $this->assertTrue(Permission::where('name', 'branches.delete')->exists());
         $this->assertTrue(Permission::where('name', 'inventory.adjust')->exists());
+        $this->assertTrue(Permission::where('name', 'customers.view')->exists());
+        $this->assertTrue(Permission::where('name', 'customers.delete')->exists());
     }
 
     public function test_seeder_creates_admin_role_with_all_permissions(): void
@@ -50,6 +52,9 @@ class DatabaseSeederTest extends TestCase
         $this->assertTrue($manager->hasPermissionTo('branches.view'));
         $this->assertFalse($manager->hasPermissionTo('branches.create'));
         $this->assertTrue($manager->hasPermissionTo('inventory.adjust'));
+        $this->assertTrue($manager->hasPermissionTo('customers.view'));
+        $this->assertTrue($manager->hasPermissionTo('customers.create'));
+        $this->assertTrue($manager->hasPermissionTo('customers.delete'));
     }
 
     public function test_seeder_creates_employee_role_with_view_only_product_access(): void
@@ -64,6 +69,8 @@ class DatabaseSeederTest extends TestCase
         $this->assertFalse($employee->hasPermissionTo('products.update'));
         $this->assertFalse($employee->hasPermissionTo('products.delete'));
         $this->assertFalse($employee->hasPermissionTo('inventory.adjust'));
+        $this->assertTrue($employee->hasPermissionTo('customers.view'));
+        $this->assertFalse($employee->hasPermissionTo('customers.create'));
     }
 
     public function test_seeder_creates_admin_user_assigned_to_admin_role(): void
