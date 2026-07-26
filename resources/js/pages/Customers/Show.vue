@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import PageHeader from '@/components/PageHeader.vue';
+import DataTable from '@/components/DataTable.vue';
 import { type BreadcrumbItem } from '@/types';
-import { type Customer } from '@/types/models';
+import { type Customer, type Sale, type Paginated } from '@/types/models';
 import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps<{
     customer: Customer;
+    sales: Paginated<Sale>;
+    lastPurchaseAt: string | null;
+    purchaseFrequency: number;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -18,6 +22,13 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: props.customer.name,
         href: `/customers/${props.customer.id}`,
     },
+];
+
+const saleColumns = [
+    { key: 'invoice_number', label: 'Invoice' },
+    { key: 'sale_date', label: 'Date' },
+    { key: 'total_amount', label: 'Total' },
+    { key: 'status_label', label: 'Status' },
 ];
 </script>
 
@@ -57,10 +68,27 @@ const breadcrumbs: BreadcrumbItem[] = [
             </div>
 
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative rounded-xl border md:min-h-min">
-                <div class="mx-auto my-10 max-w-2xl rounded-xl bg-white p-6 text-center text-gray-500 shadow-md">
-                    Purchase history coming soon.
+                <div class="mx-auto my-6 grid max-w-2xl grid-cols-2 gap-4 rounded-xl bg-white p-6 shadow-md">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Last Purchase</dt>
+                        <dd class="text-gray-900">{{ lastPurchaseAt ? new Date(lastPurchaseAt).toLocaleDateString() : 'Never' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Purchase Frequency</dt>
+                        <dd class="text-gray-900">{{ purchaseFrequency }} {{ purchaseFrequency === 1 ? 'sale' : 'sales' }}</dd>
+                    </div>
                 </div>
             </div>
+
+            <DataTable :columns="saleColumns" :data="sales" empty-message="No purchases yet.">
+                <template #cell-invoice_number="{ row }">
+                    <Link :href="route('sales.show', row.id)" class="text-blue-600 hover:underline">{{ row.invoice_number }}</Link>
+                </template>
+                <template #cell-sale_date="{ row }">
+                    {{ new Date(row.sale_date).toLocaleDateString() }}
+                </template>
+                <template #cell-total_amount="{ row }"> ${{ row.total_amount }} </template>
+            </DataTable>
         </div>
     </AppLayout>
 </template>

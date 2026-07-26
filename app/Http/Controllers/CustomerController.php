@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Resources\CustomerResource;
+use App\Http\Resources\SaleResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -50,14 +51,26 @@ class CustomerController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource, including purchase history.
      *
-     * Purchase history is added in a later module — placeholder for now.
+     * last_purchase_at/purchase_frequency are computed live off `sales`
+     * (ARCHITECTURE.md §4.2) and passed separately from CustomerResource so
+     * the paginated Customers/Index list (which reuses CustomerResource)
+     * doesn't pay for two extra queries per row.
      */
     public function show(Customer $customer)
     {
+        $sales = $customer->sales()
+            ->with(['items.product', 'branch'])
+            ->latest('sale_date')
+            ->paginate(10)
+            ->withQueryString();
+
         return Inertia::render('Customers/Show', [
             'customer' => CustomerResource::make($customer),
+            'sales' => SaleResource::collection($sales)->response()->getData(true),
+            'lastPurchaseAt' => $customer->lastPurchaseAt(),
+            'purchaseFrequency' => $customer->purchaseFrequency(),
         ]);
     }
 

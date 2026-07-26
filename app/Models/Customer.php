@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -21,6 +22,23 @@ class Customer extends Model
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);
+    }
+
+    /**
+     * Derived, not stored (ARCHITECTURE.md §4.2) — matches the same
+     * unfiltered-by-status definition of "a purchase" used by
+     * Customer::scopeLost().
+     */
+    public function lastPurchaseAt(): ?Carbon
+    {
+        $maxDate = $this->sales()->max('sale_date');
+
+        return $maxDate ? Carbon::parse($maxDate) : null;
+    }
+
+    public function purchaseFrequency(): int
+    {
+        return $this->sales()->count();
     }
 
     public function scopeSearch(Builder $query, ?string $term): Builder
