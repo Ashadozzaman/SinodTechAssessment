@@ -15,4 +15,16 @@ return [
 
     'lost_customer_days' => env('CRM_LOST_CUSTOMER_DAYS', 90),
 
+    /*
+    |--------------------------------------------------------------------------
+    | KPI Award Points
+    |--------------------------------------------------------------------------
+    |
+    | Points added to an employee's kpi_score when a sale is completed for
+    | a customer they hold an active assignment for (ARCHITECTURE.md §5.3).
+    |
+    */
+
+    'kpi_award_points' => env('CRM_KPI_AWARD_POINTS', 10),
+
 ];

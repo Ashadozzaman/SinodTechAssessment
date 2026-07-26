@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -59,5 +60,17 @@ class User extends Authenticatable
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);
+    }
+
+    public function scopeSearch(Builder $query, ?string $term): Builder
+    {
+        if (! $term) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $query) use ($term) {
+            $query->where('name', 'like', "%{$term}%")
+                ->orWhere('email', 'like', "%{$term}%");
+        });
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CustomerAssignmentController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\KpiLeaderboardController;
 use App\Http\Controllers\LostCustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
@@ -111,6 +112,12 @@ Route::middleware('auth', 'prevent_back')->group(function () {
         ->name('customers.assign')
         ->middleware("permission:customers.assign");
     //** Customer Assignments Route End */
+
+    //** KPI Leaderboard Route Start */
+    Route::get('kpi-leaderboard', [KpiLeaderboardController::class, 'index'])
+        ->name('kpi-leaderboard.index')
+        ->middleware("permission:kpi.view");
+    //** KPI Leaderboard Route End */
 
     //** Inventory Route Start */
     Route::put('products/{product}/stock', [InventoryController::class, 'update'])

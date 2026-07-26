@@ -47,6 +47,13 @@ export interface LostCustomer {
     created_at: string;
 }
 
+export interface EmployeeKpi {
+    id: number;
+    name: string;
+    email: string | null;
+    kpi_score: number;
+}
+
 export interface EmployeeOption {
     id: number;
     name: string;
