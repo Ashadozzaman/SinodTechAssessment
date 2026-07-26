@@ -8,6 +8,12 @@ export interface Branch {
     updated_at: string;
 }
 
+export interface GeneralSetting {
+    company_name: string;
+    currency_symbol: string;
+    logo_url: string | null;
+}
+
 export interface Category {
     id: number;
     name: string;

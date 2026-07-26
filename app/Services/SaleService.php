@@ -8,6 +8,8 @@ use App\Exceptions\InsufficientStockException;
 use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\Sale;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\PDF as PdfDocument;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -83,5 +85,17 @@ class SaleService
         SaleCompleted::dispatch($sale);
 
         return $sale;
+    }
+
+    /**
+     * Render the invoice PDF for a sale on demand, reusing the same view as
+     * the queued GenerateInvoicePdfJob so download/print never have to wait
+     * on that job's queue (and stay identical in layout to the emailed copy).
+     */
+    public function renderInvoicePdf(Sale $sale): PdfDocument
+    {
+        $sale->loadMissing(['branch', 'customer', 'items.product']);
+
+        return Pdf::loadView('invoices.pdf', ['sale' => $sale]);
     }
 }

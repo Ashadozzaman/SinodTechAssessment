@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\GeneralController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -18,4 +19,13 @@ Route::middleware('auth')->group(function () {
     Route::get('settings/appearance', function () {
         return Inertia::render('settings/Appearance');
     })->name('appearance');
+
+    //** Settings General Route Start */
+    Route::get('settings/general', [GeneralController::class, 'edit'])
+        ->name('general.edit')
+        ->middleware('permission:settings.view|settings.update');
+    Route::post('settings/general', [GeneralController::class, 'update'])
+        ->name('general.update')
+        ->middleware('permission:settings.update');
+    //** Settings General Route End */
 });

@@ -15,6 +15,19 @@
     </style>
 </head>
 <body>
+    <table style="width: 100%; margin-bottom: 12px;">
+        <tr>
+            <td style="width: 48px; vertical-align: middle;">
+                @if ($setting->logo_file_path)
+                    <img src="{{ $setting->logo_file_path }}" alt="{{ $setting->company_name }}" style="max-width: 48px; max-height: 48px;">
+                @endif
+            </td>
+            <td style="vertical-align: middle;">
+                <strong style="font-size: 16px;">{{ $setting->company_name }}</strong>
+            </td>
+        </tr>
+    </table>
+
     <h1>Invoice {{ $sale->invoice_number }}</h1>
     <div class="meta">{{ $sale->sale_date->format('Y-m-d H:i') }}</div>
 
@@ -39,13 +52,13 @@
                 <tr>
                     <td>{{ $item->product->name }}</td>
                     <td class="text-right">{{ $item->quantity }}</td>
-                    <td class="text-right">{{ number_format($item->unit_price, 2) }}</td>
-                    <td class="text-right">{{ number_format($item->subtotal, 2) }}</td>
+                    <td class="text-right">{{ $setting->currency_symbol }}{{ number_format($item->unit_price, 2) }}</td>
+                    <td class="text-right">{{ $setting->currency_symbol }}{{ number_format($item->subtotal, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>
     </table>
 
-    <div class="totals">Total: {{ number_format($sale->total_amount, 2) }}</div>
+    <div class="totals">Total: {{ $setting->currency_symbol }}{{ number_format($sale->total_amount, 2) }}</div>
 </body>
 </html>

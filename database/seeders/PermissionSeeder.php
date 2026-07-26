@@ -42,6 +42,8 @@ class PermissionSeeder extends Seeder
             'sales.create',
             'sales.update',
             'sales.delete',
+            'settings.view',
+            'settings.update',
         ];
 
         foreach ($permissions as $permission) {

@@ -12,6 +12,7 @@ use App\Models\Sale;
 use App\Services\SaleService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SaleController extends Controller
 {
@@ -27,11 +28,7 @@ class SaleController extends Controller
     {
         $filters = $request->only(['search', 'branch_id', 'status']);
 
-        $sales = Sale::with(['customer', 'branch', 'cashier'])
-            ->search($filters['search'] ?? null)
-            ->when($filters['branch_id'] ?? null, fn ($query, $branchId) => $query->where('branch_id', $branchId))
-            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
-            ->latest('sale_date')
+        $sales = $this->filteredSales($filters)
             ->paginate(15)
             ->withQueryString();
 
@@ -40,6 +37,52 @@ class SaleController extends Controller
             'branches' => Branch::orderBy('name')->get(['id', 'name']),
             'filters' => $filters,
         ]);
+    }
+
+    /**
+     * Shared filtered query for the index listing and the CSV export, so
+     * "export" always reflects exactly what's currently on screen
+     * (same search/branch/status params, same sort).
+     */
+    private function filteredSales(array $filters)
+    {
+        return Sale::with(['customer', 'branch', 'cashier'])
+            ->search($filters['search'] ?? null)
+            ->when($filters['branch_id'] ?? null, fn ($query, $branchId) => $query->where('branch_id', $branchId))
+            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->latest('sale_date');
+    }
+
+    /**
+     * Stream the currently filtered sales list as a CSV file (opens
+     * directly in Excel) — respects the same search/branch/status query
+     * params as the index listing.
+     */
+    public function export(Request $request): StreamedResponse
+    {
+        $filters = $request->only(['search', 'branch_id', 'status']);
+        $sales = $this->filteredSales($filters)->get();
+
+        $filename = 'sales-'.now()->format('Y-m-d-His').'.csv';
+
+        return response()->streamDownload(function () use ($sales) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Invoice #', 'Customer', 'Branch', 'Cashier', 'Status', 'Date', 'Total']);
+
+            foreach ($sales as $sale) {
+                fputcsv($handle, [
+                    $sale->invoice_number,
+                    $sale->customer?->name ?? '—',
+                    $sale->branch?->name ?? '—',
+                    $sale->cashier?->name ?? '—',
+                    $sale->status->label(),
+                    $sale->sale_date->format('Y-m-d H:i'),
+                    $sale->total_amount,
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv']);
     }
 
     /**
@@ -79,6 +122,29 @@ class SaleController extends Controller
         return Inertia::render('Sales/Show', [
             'sale' => SaleResource::make($sale),
         ]);
+    }
+
+    /**
+     * Force-download the invoice PDF. Rendered on demand rather than reading
+     * the queued GenerateInvoicePdfJob's stored copy, so it works even if
+     * that job hasn't run yet.
+     */
+    public function downloadInvoice(Sale $sale)
+    {
+        return $this->saleService->renderInvoicePdf($sale)->download("{$sale->invoice_number}.pdf");
+    }
+
+    /**
+     * Render a narrow, thermal-receipt-formatted view (80mm width) and
+     * auto-trigger the browser print dialog — a full A4 PDF view is unusable
+     * on a thermal receipt printer, so this is a separate layout from the
+     * downloadable invoice PDF, not a reuse of it.
+     */
+    public function printInvoice(Sale $sale)
+    {
+        $sale->loadMissing(['branch', 'customer', 'items.product']);
+
+        return view('invoices.thermal', ['sale' => $sale]);
     }
 
     /**

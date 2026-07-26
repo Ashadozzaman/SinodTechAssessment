@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import InputError from '@/components/InputError.vue';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 import { type Branch, type CustomerSearchResult, type ProductSearchResult } from '@/types/models';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Sales', href: '/sales' },
     { title: 'New Sale', href: '/sales/create' },
 ];
+
+const page = usePage<SharedData>();
 
 const props = defineProps<{
     branches: Branch[];
@@ -196,7 +198,7 @@ function submit() {
                             @click="addProduct(product)"
                         >
                             <span>{{ product.name }} ({{ product.sku }})</span>
-                            <span class="text-gray-500">{{ product.available_stock }} in stock · ${{ product.price }}</span>
+                            <span class="text-gray-500">{{ product.available_stock }} in stock · {{ page.props.settings.currency_symbol }}{{ product.price }}</span>
                         </li>
                     </ul>
                 </div>
@@ -218,7 +220,7 @@ function submit() {
                         </tr>
                         <tr v-for="line in cart" :key="line.product_id" class="border-b">
                             <td class="py-2">{{ line.name }}</td>
-                            <td class="py-2">${{ line.unit_price.toFixed(2) }}</td>
+                            <td class="py-2">{{ page.props.settings.currency_symbol }}{{ line.unit_price.toFixed(2) }}</td>
                             <td class="py-2">
                                 <input
                                     v-model.number="line.quantity"
@@ -228,7 +230,7 @@ function submit() {
                                     class="w-20 rounded border p-1"
                                 />
                             </td>
-                            <td class="py-2">${{ (line.unit_price * line.quantity).toFixed(2) }}</td>
+                            <td class="py-2">{{ page.props.settings.currency_symbol }}{{ (line.unit_price * line.quantity).toFixed(2) }}</td>
                             <td class="py-2">
                                 <button type="button" class="text-red-600 hover:underline" @click="removeLine(line.product_id)">Remove</button>
                             </td>
@@ -237,7 +239,7 @@ function submit() {
                 </table>
 
                 <div class="mt-4 flex items-center justify-between border-t pt-4">
-                    <span class="text-lg font-semibold">Total: ${{ total.toFixed(2) }}</span>
+                    <span class="text-lg font-semibold">Total: {{ page.props.settings.currency_symbol }}{{ total.toFixed(2) }}</span>
                     <button
                         type="button"
                         :disabled="form.processing || cart.length === 0 || !form.customer_id || !form.branch_id"

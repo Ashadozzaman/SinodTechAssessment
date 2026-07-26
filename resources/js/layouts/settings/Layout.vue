@@ -2,8 +2,10 @@
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { can } from '@/lib/can';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -18,7 +20,14 @@ const sidebarNavItems: NavItem[] = [
         title: 'Appearance',
         href: '/settings/appearance',
     },
+    {
+        title: 'General',
+        href: '/settings/general',
+        permission: 'settings.view',
+    },
 ];
+
+const visibleNavItems = computed(() => sidebarNavItems.filter((item) => !item.permission || can(item.permission)));
 
 const page = usePage();
 
@@ -33,7 +42,7 @@ const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.locati
             <aside class="w-full max-w-xl lg:w-48">
                 <nav class="flex flex-col space-x-0 space-y-1">
                     <Button
-                        v-for="item in sidebarNavItems"
+                        v-for="item in visibleNavItems"
                         :key="item.href"
                         variant="ghost"
                         :class="['w-full justify-start', { 'bg-muted': currentPath === item.href }]"

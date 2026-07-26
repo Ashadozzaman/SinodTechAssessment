@@ -4,9 +4,11 @@ import DataTable from '@/components/DataTable.vue';
 import PageHeader from '@/components/PageHeader.vue';
 import { useTableFilters } from '@/composables/useTableFilters';
 import { can } from '@/lib/can';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 import { type Branch, type Paginated, type Sale } from '@/types/models';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+
+const page = usePage<SharedData>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -35,6 +37,16 @@ const { filters, setSearch, setFilter } = useTableFilters(
     ['sales'],
 );
 
+const exportUrl = () => {
+    const params = new URLSearchParams();
+    if (filters.search) params.set('search', filters.search);
+    if (filters.branch_id) params.set('branch_id', filters.branch_id);
+    if (filters.status) params.set('status', filters.status);
+
+    const query = params.toString();
+    return route('sales.export') + (query ? `?${query}` : '');
+};
+
 const columns = [
     { key: 'invoice_number', label: 'Invoice #' },
     { key: 'customer', label: 'Customer' },
@@ -52,6 +64,12 @@ const columns = [
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <PageHeader title="Sales" description="Point-of-sale transaction history.">
                 <template #actions>
+                    <a
+                        :href="exportUrl()"
+                        class="border-sidebar-border/70 dark:border-sidebar-border cursor-pointer rounded-md border px-4 py-2 hover:bg-purple-200"
+                    >
+                        Export Excel
+                    </a>
                     <Link
                         v-if="can('sales.create')"
                         :href="route('sales.create')"
@@ -106,7 +124,7 @@ const columns = [
                     {{ row.branch?.name ?? '—' }}
                 </template>
 
-                <template #cell-total_amount="{ row }"> ${{ row.total_amount }} </template>
+                <template #cell-total_amount="{ row }"> {{ page.props.settings.currency_symbol }}{{ row.total_amount }} </template>
 
                 <template #cell-status="{ row }">
                     <span
