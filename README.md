@@ -2,8 +2,6 @@
 
 A Laravel 12 + Vue 3 (Inertia) Sales, Inventory & CRM system, built as a
 technical assessment on top of an existing role-based-auth starter kit.
-Design rationale lives in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md);
-working standards and conventions live in [`CLAUDE.md`](CLAUDE.md).
 
 ## Completed Features
 
@@ -112,10 +110,10 @@ insufficient-stock rejection immediately), lost-customer assignments, KPI
 history, re-engagement history, and an API consumer token are all created.
 Seeded login for every user is password `password`:
 
-| Role | Email |
-|---|---|
-| Admin | `admin@example.com` |
-| Manager (per branch) | `manager.<branch>@example.com` |
+| Role                      | Email                                                              |
+| ------------------------- | ------------------------------------------------------------------ |
+| Admin                     | `admin@example.com`                                                |
+| Manager (per branch)      | `manager.<branch>@example.com`                                     |
 | Employee (per branch, x2) | `employee1.<branch>@example.com`, `employee2.<branch>@example.com` |
 
 The seeder also prints a Sanctum API token to the console (from
