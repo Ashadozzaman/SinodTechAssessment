@@ -4,30 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Branch extends Model
+class Product extends Model
 {
     /**
      * @var list<string>
      */
     protected $fillable = [
         'name',
-        'address',
-        'phone',
+        'sku',
+        'category_id',
+        'price',
+        'description',
         'is_active',
     ];
 
     protected function casts(): array
     {
         return [
+            'price' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }
 
-    public function users(): HasMany
+    public function category(): BelongsTo
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function scopeSearch(Builder $query, ?string $term): Builder
@@ -38,7 +41,7 @@ class Branch extends Model
 
         return $query->where(function (Builder $query) use ($term) {
             $query->where('name', 'like', "%{$term}%")
-                ->orWhere('address', 'like', "%{$term}%");
+                ->orWhere('sku', 'like', "%{$term}%");
         });
     }
 }

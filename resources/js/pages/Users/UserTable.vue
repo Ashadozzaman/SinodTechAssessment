@@ -1,17 +1,11 @@
 <script setup>
 import { can } from '@/lib/can';
+import { confirmDelete } from '@/lib/confirm';
 import { router } from '@inertiajs/vue3';
 const props = defineProps(['users']);
 
-// const confirmDelete = (event) => {
-//     if (confirm('Are you sure you want to delete this user?')) {
-//         event.preventDefault();
-//     }
-//     return false;
-// };
-
-const deleteUser = (id) => {
-    if (confirm('Are you sure you want to delete this user?')) {
+const deleteUser = async (id) => {
+    if (await confirmDelete('Are you sure you want to delete this user?')) {
         router.delete(route('users.destroy', id), {
             preserveScroll: true,
             onSuccess: () => {

@@ -79,8 +79,12 @@ found in the orientation step:
 3. Extend the `users` table with `branch_id` (nullable, FK to branches) and
    `kpi_score` (unsigned int, default 0) via a new migration — don't edit
    the original starter kit migration.
-4. Register a BranchPolicy: only Admin can create/edit/delete branches;
-   Manager/Employee can view their own branch.
+4. Following CLAUDE.md §3a: seed `branches.view/create/update/delete`
+   permissions, attach the appropriate ones to each role (Admin gets all
+   four; Manager/Employee get `branches.view` only), and split the
+   `Route::resource('branches', ...)` in web.php across
+   `->only([...])->middleware('permission:...')` calls exactly like the
+   existing `users`/`roles` routes — do not create a BranchPolicy.
 
 Write a BranchSeeder with 3 realistic branches (different cities).
 Run migrations and the seeder, confirm it works, then stop.
@@ -102,7 +106,11 @@ Following ARCHITECTURE.md §4.2, build the product catalog:
    price numeric min 0, etc).
 3. ProductController (index/create/store/edit/update/destroy) — thin,
    delegates nothing complex yet (no service needed for plain CRUD).
-4. ProductPolicy: Admin/Manager can manage products, Employee can only view.
+4. Following CLAUDE.md §3a: seed `products.view/create/update/delete`
+   permissions (Admin: all four; Manager: all four; Employee: view only),
+   and split the products `Route::resource()` across
+   `->only([...])->middleware('permission:...')` calls the same way
+   `branches` was done in Prompt 1 — no ProductPolicy.
 5. Inertia pages under resources/js/Pages/Products for list/create/edit,
    matching the starter kit's existing UI conventions (check an existing
    page for the component/layout patterns before building new ones).
@@ -131,7 +139,8 @@ Following ARCHITECTURE.md §4.2 and §5.5:
      with lockForUpdate)
 3. Add a "Stock" tab/section to the Product show/edit page showing
    per-branch quantities, editable by Admin/Manager only (enforce via
-   ProductPolicy or a dedicated check).
+   a new `inventory.adjust` permission per CLAUDE.md §3a, granted to
+   Admin/Manager only).
 4. ProductStockSeeder: seed realistic stock quantities for every
    product/branch combination.
 
@@ -155,9 +164,12 @@ Following ARCHITECTURE.md §4.2:
 3. CustomerController + Inertia pages (list with search by name/phone,
    create/edit, show page — show page is a placeholder for now, purchase
    history comes in Prompt 6).
-4. CustomerPolicy: Admin/Manager full access; Employee can view customers
-   assigned to them (assignment logic comes in Prompt 9, so for now Employee
-   can view all — we'll tighten this later).
+4. Following CLAUDE.md §3a: seed `customers.view/create/update/delete`
+   permissions (Admin/Manager: all four; Employee: view only) and split the
+   customers `Route::resource()` the same way as `branches`/`products`. For
+   now Employee's `customers.view` permission lets them see all customers —
+   Prompt 9 will narrow the *query* (not the permission) so an Employee only
+   sees customers assigned to them.
 5. CustomerSeeder: 40+ realistic customers with varied created_at dates
    (spread over the last 12 months, since Prompt 8's lost-customer logic
    needs some genuinely old ones to detect).
@@ -198,6 +210,10 @@ This is the most important prompt in the project — read ARCHITECTURE.md
 7. Register (empty, no-op for now) listeners for SaleCompleted — we'll fill
    these in over the next few prompts. Just get the event wired up and
    confirm it fires.
+8. Following CLAUDE.md §3a: seed `sales.view/create/update/delete`
+   permissions (Admin: all four; Manager: all four; Employee: `sales.view`
+   + `sales.create` only, no update/delete on completed sales) and split
+   the sales `Route::resource()` the same way as the earlier modules.
 
 Write Feature tests: successful sale deducts stock correctly; a sale
 exceeding available stock is fully rejected with zero stock change; the
@@ -296,9 +312,13 @@ Following ARCHITECTURE.md §4.2 and §5.3:
    already exists).
 3. Add an "Assign to employee" action on the Lost Customers page (Prompt 8),
    Admin-only, with a dropdown of Employee-role users.
-4. Update CustomerPolicy: an Employee can now view a customer if they have
-   an active assignment for them (tighten the "all customers" placeholder
-   from Prompt 4).
+4. Seed a `customers.assign` permission (per CLAUDE.md §3a) restricted to
+   Admin only, and apply it to the assignment route. Then narrow
+   CustomerController's index/show queries so a user who only holds
+   `customers.view` (i.e. Employee) sees only customers with an active
+   `customer_assignments` row pointing to them — this replaces the "all
+   customers" placeholder from Prompt 4 at the query level, not via a
+   Policy.
 
 Write a test confirming a second active assignment attempt is rejected, and
 that resolving an assignment allows a new one to be created.
@@ -352,9 +372,12 @@ Following ARCHITECTURE.md §5.4:
    - channel = sms: no real gateway available — log the message and mark
      status 'simulated'. Make this distinction visible in a code comment
      and in the README later.
-3. Add a "Send re-engagement" action on the Lost Customers page, letting
-   Admin/Manager pick channel + a message (with a sensible default
-   template), visible engagement history on the Customer show page.
+3. Seed a `crm.reengage` permission (per CLAUDE.md §3a, same pattern as
+   `customers.assign` in Prompt 9), granted to Admin/Manager, and gate the
+   route with it. Add a "Send re-engagement" action on the Lost Customers
+   page using it, letting Admin/Manager pick channel + a message (with a
+   sensible default template), visible engagement history on the Customer
+   show page.
 
 Test: confirm email channel dispatches Mail::fake()'d mail and creates a
 'sent' row; sms channel creates a 'simulated' row without attempting real
@@ -425,8 +448,9 @@ click through the whole app. Give feedback, commit, then continue.
 Read through CLAUDE.md §6 (Testing Expectations). Audit the existing test
 suite against that checklist and fill any gaps — in particular:
 - Concurrent-sale stock race condition test, if not already covered
-- Any Policy (authorization) that doesn't yet have a test confirming
-  Employee/Manager/Admin boundaries
+- Any permission-gated route (per CLAUDE.md §3a) that doesn't yet have a
+  test confirming Employee/Manager/Admin boundaries return the correct
+  200/403
 - Boundary test for the lost-customer scope, if skipped earlier
 
 Don't add tests for the sake of coverage numbers — only for the

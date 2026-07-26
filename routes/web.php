@@ -3,6 +3,8 @@
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 
@@ -47,6 +49,36 @@ Route::middleware('auth', 'prevent_back')->group(function () {
         ->only(['index', 'show'])
         ->middleware("permission:roles.view|roles.create|roles.update|roles.delete");
     //** Roles Route End */
+
+    //** Branches Route Start */
+    Route::resource('branches', BranchController::class)
+        ->only(['create', 'store'])
+        ->middleware("permission:branches.create");
+    Route::resource('branches', BranchController::class)
+        ->only(['edit', 'update'])
+        ->middleware("permission:branches.update");
+    Route::resource('branches', BranchController::class)
+        ->only(['destroy'])
+        ->middleware("permission:branches.delete");
+    Route::resource('branches', BranchController::class)
+        ->only(['index'])
+        ->middleware("permission:branches.view|branches.create|branches.update|branches.delete");
+    //** Branches Route End */
+
+    //** Products Route Start */
+    Route::resource('products', ProductController::class)
+        ->only(['create', 'store'])
+        ->middleware("permission:products.create");
+    Route::resource('products', ProductController::class)
+        ->only(['edit', 'update'])
+        ->middleware("permission:products.update");
+    Route::resource('products', ProductController::class)
+        ->only(['destroy'])
+        ->middleware("permission:products.delete");
+    Route::resource('products', ProductController::class)
+        ->only(['index'])
+        ->middleware("permission:products.view|products.create|products.update|products.delete");
+    //** Products Route End */
 });
 
 require __DIR__ . '/settings.php';

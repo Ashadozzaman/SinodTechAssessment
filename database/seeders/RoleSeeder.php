@@ -16,7 +16,19 @@ class RoleSeeder extends Seeder
         $admin = Role::firstOrCreate(['name' => 'Admin']);
         $admin->syncPermissions(Permission::all());
 
-        Role::firstOrCreate(['name' => 'Manager']);
-        Role::firstOrCreate(['name' => 'Employee']);
+        $manager = Role::firstOrCreate(['name' => 'Manager']);
+        $manager->syncPermissions([
+            'products.view',
+            'products.create',
+            'products.update',
+            'products.delete',
+            'branches.view',
+        ]);
+
+        $employee = Role::firstOrCreate(['name' => 'Employee']);
+        $employee->syncPermissions([
+            'products.view',
+            'branches.view',
+        ]);
     }
 }

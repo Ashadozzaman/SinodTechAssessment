@@ -16,9 +16,13 @@ class DatabaseSeederTest extends TestCase
     {
         $this->seed();
 
-        $this->assertSame(8, Permission::count());
+        $this->assertSame(16, Permission::count());
         $this->assertTrue(Permission::where('name', 'users.view')->exists());
         $this->assertTrue(Permission::where('name', 'roles.delete')->exists());
+        $this->assertTrue(Permission::where('name', 'products.view')->exists());
+        $this->assertTrue(Permission::where('name', 'products.delete')->exists());
+        $this->assertTrue(Permission::where('name', 'branches.view')->exists());
+        $this->assertTrue(Permission::where('name', 'branches.delete')->exists());
     }
 
     public function test_seeder_creates_admin_role_with_all_permissions(): void
@@ -31,17 +35,32 @@ class DatabaseSeederTest extends TestCase
         $this->assertSame(Permission::count(), $admin->permissions()->count());
     }
 
-    public function test_seeder_creates_manager_and_employee_roles_with_no_permissions(): void
+    public function test_seeder_creates_manager_role_with_full_product_management(): void
     {
         $this->seed();
 
         $manager = Role::where('name', 'Manager')->first();
-        $employee = Role::where('name', 'Employee')->first();
 
         $this->assertNotNull($manager);
+        $this->assertTrue($manager->hasPermissionTo('products.view'));
+        $this->assertTrue($manager->hasPermissionTo('products.create'));
+        $this->assertTrue($manager->hasPermissionTo('products.update'));
+        $this->assertTrue($manager->hasPermissionTo('products.delete'));
+        $this->assertTrue($manager->hasPermissionTo('branches.view'));
+        $this->assertFalse($manager->hasPermissionTo('branches.create'));
+    }
+
+    public function test_seeder_creates_employee_role_with_view_only_product_access(): void
+    {
+        $this->seed();
+
+        $employee = Role::where('name', 'Employee')->first();
+
         $this->assertNotNull($employee);
-        $this->assertSame(0, $manager->permissions()->count());
-        $this->assertSame(0, $employee->permissions()->count());
+        $this->assertTrue($employee->hasPermissionTo('products.view'));
+        $this->assertFalse($employee->hasPermissionTo('products.create'));
+        $this->assertFalse($employee->hasPermissionTo('products.update'));
+        $this->assertFalse($employee->hasPermissionTo('products.delete'));
     }
 
     public function test_seeder_creates_admin_user_assigned_to_admin_role(): void
