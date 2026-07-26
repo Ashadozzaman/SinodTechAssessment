@@ -31,14 +31,17 @@ class DatabaseSeederTest extends TestCase
         $this->assertSame(Permission::count(), $admin->permissions()->count());
     }
 
-    public function test_seeder_creates_staff_role_with_no_permissions(): void
+    public function test_seeder_creates_manager_and_employee_roles_with_no_permissions(): void
     {
         $this->seed();
 
-        $staff = Role::where('name', 'Staff')->first();
+        $manager = Role::where('name', 'Manager')->first();
+        $employee = Role::where('name', 'Employee')->first();
 
-        $this->assertNotNull($staff);
-        $this->assertSame(0, $staff->permissions()->count());
+        $this->assertNotNull($manager);
+        $this->assertNotNull($employee);
+        $this->assertSame(0, $manager->permissions()->count());
+        $this->assertSame(0, $employee->permissions()->count());
     }
 
     public function test_seeder_creates_admin_user_assigned_to_admin_role(): void
