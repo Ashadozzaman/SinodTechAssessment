@@ -23,6 +23,7 @@ class RoleSeeder extends Seeder
             'products.update',
             'products.delete',
             'branches.view',
+            'inventory.adjust',
         ]);
 
         $employee = Role::firstOrCreate(['name' => 'Employee']);

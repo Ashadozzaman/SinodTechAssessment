@@ -4,6 +4,7 @@ use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -79,6 +80,12 @@ Route::middleware('auth', 'prevent_back')->group(function () {
         ->only(['index'])
         ->middleware("permission:products.view|products.create|products.update|products.delete");
     //** Products Route End */
+
+    //** Inventory Route Start */
+    Route::put('products/{product}/stock', [InventoryController::class, 'update'])
+        ->name('inventory.adjust')
+        ->middleware("permission:inventory.adjust");
+    //** Inventory Route End */
 });
 
 require __DIR__ . '/settings.php';

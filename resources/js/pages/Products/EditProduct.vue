@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import { can } from '@/lib/can';
 import { type BreadcrumbItem } from '@/types';
-import { type Category, type Product } from '@/types/models';
+import { type Category, type Product, type ProductStockRow } from '@/types/models';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { reactive } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -14,6 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const props = defineProps<{
     product: Product;
     categories: Category[];
+    stocks: ProductStockRow[];
 }>();
 
 const form = useForm({
@@ -24,6 +27,30 @@ const form = useForm({
     description: props.product.description || '',
     is_active: props.product.is_active,
 });
+
+const stockForm = useForm({
+    branch_id: 0,
+    delta: 0,
+});
+
+const deltas = reactive<Record<number, number | null>>({});
+
+function adjustStock(branchId: number) {
+    const delta = deltas[branchId];
+
+    if (!delta) {
+        return;
+    }
+
+    stockForm.branch_id = branchId;
+    stockForm.delta = delta;
+    stockForm.put(route('inventory.adjust', props.product.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            deltas[branchId] = null;
+        },
+    });
+}
 </script>
 
 <template>
@@ -91,6 +118,48 @@ const form = useForm({
                             Submit
                         </button>
                     </form>
+                </div>
+            </div>
+
+            <div class="border-sidebar-border/70 dark:border-sidebar-border relative rounded-xl border md:min-h-min">
+                <div class="mx-auto my-10 max-w-2xl rounded-xl bg-white p-6 shadow-md">
+                    <h2 class="mb-4 text-lg font-semibold text-gray-800">Stock by Branch</h2>
+
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="py-2">Branch</th>
+                                <th class="py-2">Quantity</th>
+                                <th v-if="can('inventory.adjust')" class="py-2">Adjust</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="stock in props.stocks" :key="stock.branch_id" class="border-b last:border-0">
+                                <td class="py-2">{{ stock.branch_name }}</td>
+                                <td class="py-2">{{ stock.quantity }}</td>
+                                <td v-if="can('inventory.adjust')" class="py-2">
+                                    <div class="flex items-center gap-2">
+                                        <input
+                                            v-model.number="deltas[stock.branch_id]"
+                                            type="number"
+                                            placeholder="+/- qty"
+                                            class="w-24 rounded border p-1"
+                                        />
+                                        <button
+                                            type="button"
+                                            :disabled="stockForm.processing"
+                                            @click="adjustStock(stock.branch_id)"
+                                            class="rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700 disabled:opacity-50"
+                                        >
+                                            Adjust
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div v-if="stockForm.errors.delta" class="mt-2 text-sm text-red-500">{{ stockForm.errors.delta }}</div>
                 </div>
             </div>
         </div>

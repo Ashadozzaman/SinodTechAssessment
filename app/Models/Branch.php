@@ -30,6 +30,11 @@ class Branch extends Model
         return $this->hasMany(User::class);
     }
 
+    public function stocks(): HasMany
+    {
+        return $this->hasMany(ProductStock::class);
+    }
+
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
         if (! $term) {

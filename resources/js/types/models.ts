@@ -27,6 +27,12 @@ export interface Product {
     updated_at: string;
 }
 
+export interface ProductStockRow {
+    branch_id: number;
+    branch_name: string;
+    quantity: number;
+}
+
 export interface PaginationLink {
     url: string | null;
     label: string;

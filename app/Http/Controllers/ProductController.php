@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -60,9 +61,16 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
+        $product->load('stocks');
+
         return Inertia::render('Products/EditProduct', [
             'product' => ProductResource::make($product),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
+            'stocks' => Branch::orderBy('name')->get(['id', 'name'])->map(fn (Branch $branch) => [
+                'branch_id' => $branch->id,
+                'branch_name' => $branch->name,
+                'quantity' => $product->stocks->firstWhere('branch_id', $branch->id)?->quantity ?? 0,
+            ]),
         ]);
     }
 

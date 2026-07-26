@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             CategorySeeder::class,
             ProductSeeder::class,
+            ProductStockSeeder::class,
         ]);
 
         $admin = User::factory()->create([
