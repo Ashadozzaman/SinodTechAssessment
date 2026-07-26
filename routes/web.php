@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\LostCustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
@@ -97,6 +98,12 @@ Route::middleware('auth', 'prevent_back')->group(function () {
         ->only(['index', 'show'])
         ->middleware("permission:customers.view|customers.create|customers.update|customers.delete");
     //** Customers Route End */
+
+    //** Lost Customers Route Start */
+    Route::get('lost-customers', [LostCustomerController::class, 'index'])
+        ->name('lost-customers.index')
+        ->middleware("permission:customers.lost");
+    //** Lost Customers Route End */
 
     //** Inventory Route Start */
     Route::put('products/{product}/stock', [InventoryController::class, 'update'])

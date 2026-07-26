@@ -35,6 +35,7 @@ class PermissionSeeder extends Seeder
             "customers.create",
             "customers.update",
             "customers.delete",
+            "customers.lost",
             "sales.view",
             "sales.create",
             "sales.update",

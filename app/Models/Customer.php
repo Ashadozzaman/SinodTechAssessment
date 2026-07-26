@@ -41,6 +41,17 @@ class Customer extends Model
         return $this->sales()->count();
     }
 
+    /**
+     * Customers with no sale in the last N days (ARCHITECTURE.md §5.2).
+     * Computed live off `sales` — never a stored status column.
+     */
+    public function scopeLost(Builder $query, ?int $days = null): Builder
+    {
+        $days ??= config('crm.lost_customer_days');
+
+        return $query->whereDoesntHave('sales', fn (Builder $query) => $query->where('sale_date', '>=', now()->subDays($days)));
+    }
+
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
         if (! $term) {

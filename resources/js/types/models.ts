@@ -37,6 +37,16 @@ export interface Customer {
     updated_at: string;
 }
 
+export interface LostCustomer {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string;
+    address: string | null;
+    last_purchase_at: string | null;
+    created_at: string;
+}
+
 export interface ProductStockRow {
     branch_id: number;
     branch_name: string;
