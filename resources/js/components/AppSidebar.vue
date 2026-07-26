@@ -5,7 +5,7 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { LayoutGrid, Notebook, Users } from 'lucide-vue-next';
+import { Building2, LayoutGrid, Notebook, Package, ShoppingCart, Trophy, UserRound, UserX, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -25,6 +25,42 @@ const mainNavItems: NavItem[] = [
         href: '/roles',
         icon: Notebook,
         permission: 'roles.view',
+    },
+    {
+        title: 'Branches',
+        href: '/branches',
+        icon: Building2,
+        permission: 'branches.view',
+    },
+    {
+        title: 'Products',
+        href: '/products',
+        icon: Package,
+        permission: 'products.view',
+    },
+    {
+        title: 'Customers',
+        href: '/customers',
+        icon: UserRound,
+        permission: 'customers.view',
+    },
+    {
+        title: 'Sales',
+        href: '/sales',
+        icon: ShoppingCart,
+        permission: 'sales.view',
+    },
+    {
+        title: 'Lost Customers',
+        href: '/lost-customers',
+        icon: UserX,
+        permission: 'customers.lost',
+    },
+    {
+        title: 'KPI Leaderboard',
+        href: '/kpi-leaderboard',
+        icon: Trophy,
+        permission: 'kpi.view',
     },
 ];
 

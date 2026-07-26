@@ -13,9 +13,36 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = Role::create(['name' => 'Admin']);
+        $admin = Role::firstOrCreate(['name' => 'Admin']);
         $admin->syncPermissions(Permission::all());
 
-        Role::create(['name' => 'Staff']);
+        $manager = Role::firstOrCreate(['name' => 'Manager']);
+        $manager->syncPermissions([
+            'products.view',
+            'products.create',
+            'products.update',
+            'products.delete',
+            'branches.view',
+            'inventory.adjust',
+            'customers.view',
+            'customers.create',
+            'customers.update',
+            'customers.delete',
+            'customers.lost',
+            'crm.reengage',
+            'sales.view',
+            'sales.create',
+            'sales.update',
+            'sales.delete',
+        ]);
+
+        $employee = Role::firstOrCreate(['name' => 'Employee']);
+        $employee->syncPermissions([
+            'products.view',
+            'branches.view',
+            'customers.view',
+            'sales.view',
+            'sales.create',
+        ]);
     }
 }
