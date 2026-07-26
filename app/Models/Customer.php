@@ -29,6 +29,11 @@ class Customer extends Model
         return $this->hasMany(CustomerAssignment::class);
     }
 
+    public function engagements(): HasMany
+    {
+        return $this->hasMany(CustomerEngagement::class);
+    }
+
     /**
      * Derived, not stored (ARCHITECTURE.md §4.2) — matches the same
      * unfiltered-by-status definition of "a purchase" used by

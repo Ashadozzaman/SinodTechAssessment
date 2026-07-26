@@ -6,6 +6,7 @@ use App\Enums\AssignmentStatus;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Resources\CustomerResource;
+use App\Http\Resources\EngagementResource;
 use App\Http\Resources\SaleResource;
 use App\Models\Customer;
 use App\Models\User;
@@ -99,9 +100,19 @@ class CustomerController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Distinct page name (`engagements_page`) so paginating this list
+        // doesn't collide with the sales history paginator above, which
+        // uses the default `page` query param.
+        $engagements = $customer->engagements()
+            ->with('triggeredBy')
+            ->latest('sent_at')
+            ->paginate(10, ['*'], 'engagements_page')
+            ->withQueryString();
+
         return Inertia::render('Customers/Show', [
             'customer' => CustomerResource::make($customer),
             'sales' => SaleResource::collection($sales)->response()->getData(true),
+            'engagements' => EngagementResource::collection($engagements)->response()->getData(true),
             'lastPurchaseAt' => $customer->lastPurchaseAt(),
             'purchaseFrequency' => $customer->purchaseFrequency(),
         ]);

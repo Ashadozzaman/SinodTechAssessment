@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CustomerAssignmentController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerEngagementController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\KpiLeaderboardController;
 use App\Http\Controllers\LostCustomerController;
@@ -112,6 +113,12 @@ Route::middleware('auth', 'prevent_back')->group(function () {
         ->name('customers.assign')
         ->middleware("permission:customers.assign");
     //** Customer Assignments Route End */
+
+    //** Re-engagement Route Start */
+    Route::post('customers/{customer}/reengage', [CustomerEngagementController::class, 'store'])
+        ->name('customers.reengage')
+        ->middleware("permission:crm.reengage");
+    //** Re-engagement Route End */
 
     //** KPI Leaderboard Route Start */
     Route::get('kpi-leaderboard', [KpiLeaderboardController::class, 'index'])

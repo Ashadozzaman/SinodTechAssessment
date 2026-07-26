@@ -36,6 +36,7 @@ class PermissionSeeder extends Seeder
             'customers.delete',
             'customers.lost',
             'customers.assign',
+            'crm.reengage',
             'kpi.view',
             'sales.view',
             'sales.create',

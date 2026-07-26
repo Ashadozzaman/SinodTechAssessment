@@ -3,12 +3,13 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import PageHeader from '@/components/PageHeader.vue';
 import DataTable from '@/components/DataTable.vue';
 import { type BreadcrumbItem } from '@/types';
-import { type Customer, type Sale, type Paginated } from '@/types/models';
+import { type Customer, type Engagement, type Sale, type Paginated } from '@/types/models';
 import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps<{
     customer: Customer;
     sales: Paginated<Sale>;
+    engagements: Paginated<Engagement>;
     lastPurchaseAt: string | null;
     purchaseFrequency: number;
 }>();
@@ -30,6 +31,22 @@ const saleColumns = [
     { key: 'total_amount', label: 'Total' },
     { key: 'status_label', label: 'Status' },
 ];
+
+const engagementColumns = [
+    { key: 'channel_label', label: 'Channel' },
+    { key: 'message', label: 'Message' },
+    { key: 'status_label', label: 'Status' },
+    { key: 'sent_at', label: 'Sent At' },
+    { key: 'triggered_by', label: 'Triggered By' },
+];
+
+const engagementStatusClass = (status: Engagement['status']) => {
+    return {
+        sent: 'bg-green-100 text-green-800',
+        simulated: 'bg-yellow-100 text-yellow-800',
+        failed: 'bg-red-100 text-red-800',
+    }[status];
+};
 </script>
 
 <template>
@@ -88,6 +105,18 @@ const saleColumns = [
                     {{ new Date(row.sale_date).toLocaleDateString() }}
                 </template>
                 <template #cell-total_amount="{ row }"> ${{ row.total_amount }} </template>
+            </DataTable>
+
+            <PageHeader title="Engagement History" description="Past re-engagement attempts sent to this customer." />
+
+            <DataTable :columns="engagementColumns" :data="engagements" empty-message="No re-engagement messages sent yet.">
+                <template #cell-status_label="{ row }">
+                    <span class="rounded px-2 py-1 text-xs font-medium" :class="engagementStatusClass(row.status)">
+                        {{ row.status_label }}
+                    </span>
+                </template>
+                <template #cell-sent_at="{ row }"> {{ new Date(row.sent_at).toLocaleString() }} </template>
+                <template #cell-triggered_by="{ row }"> {{ row.triggered_by ?? '—' }} </template>
             </DataTable>
         </div>
     </AppLayout>

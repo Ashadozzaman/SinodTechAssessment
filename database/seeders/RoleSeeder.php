@@ -29,6 +29,7 @@ class RoleSeeder extends Seeder
             'customers.update',
             'customers.delete',
             'customers.lost',
+            'crm.reengage',
             'sales.view',
             'sales.create',
             'sales.update',

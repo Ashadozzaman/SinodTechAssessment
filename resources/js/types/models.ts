@@ -103,6 +103,17 @@ export interface Sale {
     created_at: string;
 }
 
+export interface Engagement {
+    id: number;
+    channel: 'email' | 'sms';
+    channel_label: string;
+    message: string;
+    status: 'sent' | 'failed' | 'simulated';
+    status_label: string;
+    sent_at: string;
+    triggered_by: string | null;
+}
+
 export interface PaginationLink {
     url: string | null;
     label: string;
