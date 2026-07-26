@@ -63,6 +63,16 @@ class CustomerPurchaseHistoryTest extends TestCase
         $branch = Branch::create(['name' => 'Main', 'address' => '1 Main St', 'phone' => '0000000000']);
         $this->makeSale($customer, $branch, $actor, 'INV-100', '2026-02-01 10:00:00');
 
+        // A view-only actor (Employee) may only view customers actively
+        // assigned to them (Prompt 9 / CLAUDE.md §3a).
+        \App\Models\CustomerAssignment::create([
+            'customer_id' => $customer->id,
+            'employee_id' => $actor->id,
+            'assigned_by' => $actor->id,
+            'status' => \App\Enums\AssignmentStatus::Active,
+            'assigned_at' => now(),
+        ]);
+
         $response = $this->actingAs($actor)->get("/customers/{$customer->id}");
 
         $response->assertOk();

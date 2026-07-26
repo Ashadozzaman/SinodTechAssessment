@@ -16,7 +16,7 @@ class DatabaseSeederTest extends TestCase
     {
         $this->seed();
 
-        $this->assertSame(26, Permission::count());
+        $this->assertSame(27, Permission::count());
         $this->assertTrue(Permission::where('name', 'users.view')->exists());
         $this->assertTrue(Permission::where('name', 'roles.delete')->exists());
         $this->assertTrue(Permission::where('name', 'products.view')->exists());
@@ -27,6 +27,7 @@ class DatabaseSeederTest extends TestCase
         $this->assertTrue(Permission::where('name', 'customers.view')->exists());
         $this->assertTrue(Permission::where('name', 'customers.delete')->exists());
         $this->assertTrue(Permission::where('name', 'customers.lost')->exists());
+        $this->assertTrue(Permission::where('name', 'customers.assign')->exists());
         $this->assertTrue(Permission::where('name', 'sales.view')->exists());
         $this->assertTrue(Permission::where('name', 'sales.create')->exists());
         $this->assertTrue(Permission::where('name', 'sales.delete')->exists());
@@ -60,6 +61,7 @@ class DatabaseSeederTest extends TestCase
         $this->assertTrue($manager->hasPermissionTo('customers.create'));
         $this->assertTrue($manager->hasPermissionTo('customers.delete'));
         $this->assertTrue($manager->hasPermissionTo('customers.lost'));
+        $this->assertFalse($manager->hasPermissionTo('customers.assign'));
         $this->assertTrue($manager->hasPermissionTo('sales.view'));
         $this->assertTrue($manager->hasPermissionTo('sales.create'));
         $this->assertTrue($manager->hasPermissionTo('sales.delete'));

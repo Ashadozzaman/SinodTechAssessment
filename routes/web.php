@@ -4,6 +4,7 @@ use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\CustomerAssignmentController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LostCustomerController;
@@ -104,6 +105,12 @@ Route::middleware('auth', 'prevent_back')->group(function () {
         ->name('lost-customers.index')
         ->middleware("permission:customers.lost");
     //** Lost Customers Route End */
+
+    //** Customer Assignments Route Start */
+    Route::post('customers/{customer}/assign', [CustomerAssignmentController::class, 'store'])
+        ->name('customers.assign')
+        ->middleware("permission:customers.assign");
+    //** Customer Assignments Route End */
 
     //** Inventory Route Start */
     Route::put('products/{product}/stock', [InventoryController::class, 'update'])

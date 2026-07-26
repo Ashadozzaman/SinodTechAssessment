@@ -47,6 +47,11 @@ export interface LostCustomer {
     created_at: string;
 }
 
+export interface EmployeeOption {
+    id: number;
+    name: string;
+}
+
 export interface ProductStockRow {
     branch_id: number;
     branch_name: string;

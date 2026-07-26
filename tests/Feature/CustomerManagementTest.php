@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AssignmentStatus;
 use App\Models\Customer;
+use App\Models\CustomerAssignment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
@@ -23,7 +25,7 @@ class CustomerManagementTest extends TestCase
 
     protected function userWithPermission(string $permission): User
     {
-        $role = Role::create(['name' => $permission . '-role']);
+        $role = Role::create(['name' => $permission.'-role']);
         $role->givePermissionTo($permission);
 
         $user = User::factory()->create();
@@ -128,8 +130,19 @@ class CustomerManagementTest extends TestCase
     public function test_search_filters_customers_by_name_or_phone(): void
     {
         $actor = $this->userWithPermission('customers.view');
-        Customer::create(['name' => 'Alice Wonderland', 'phone' => '01744444444']);
+        $alice = Customer::create(['name' => 'Alice Wonderland', 'phone' => '01744444444']);
         Customer::create(['name' => 'Bob Builder', 'phone' => '01755555555']);
+
+        // A view-only actor (Employee) only sees customers actively
+        // assigned to them (Prompt 9 / CLAUDE.md §3a) — assign Alice so the
+        // search-within-scope interaction is still exercised.
+        CustomerAssignment::create([
+            'customer_id' => $alice->id,
+            'employee_id' => $actor->id,
+            'assigned_by' => $actor->id,
+            'status' => AssignmentStatus::Active,
+            'assigned_at' => now(),
+        ]);
 
         $response = $this->actingAs($actor)->get('/customers?search=Alice');
 

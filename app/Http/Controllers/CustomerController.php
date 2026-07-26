@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AssignmentStatus;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\SaleResource;
 use App\Models\Customer;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -15,13 +18,20 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * Supports `search` (matches name/phone/email).
+     * Supports `search` (matches name/phone/email). A user who only holds
+     * `customers.view` (i.e. Employee) is narrowed to customers with an
+     * active `customer_assignments` row pointing to them (CLAUDE.md §3a).
      */
     public function index(Request $request)
     {
         $filters = $request->only(['search']);
+        $user = $request->user();
 
         $customers = Customer::search($filters['search'] ?? null)
+            ->when($this->isViewOnly($user), fn (Builder $query) => $query->whereHas(
+                'assignments',
+                fn (Builder $query) => $query->where('employee_id', $user->id)->where('status', AssignmentStatus::Active)
+            ))
             ->latest()
             ->paginate(15)
             ->withQueryString();
@@ -30,6 +40,19 @@ class CustomerController extends Controller
             'customers' => CustomerResource::collection($customers)->response()->getData(true),
             'filters' => $filters,
         ]);
+    }
+
+    /**
+     * True when the user's granted permissions are limited to
+     * `customers.view` — i.e. an Employee, who may only see customers
+     * actively assigned to them (CLAUDE.md §3a).
+     */
+    private function isViewOnly(User $user): bool
+    {
+        $permissions = $user->getAllPermissions()->pluck('name');
+
+        return $permissions->contains('customers.view')
+            && $permissions->intersect(['customers.create', 'customers.update', 'customers.delete'])->isEmpty();
     }
 
     /**
@@ -58,8 +81,18 @@ class CustomerController extends Controller
      * the paginated Customers/Index list (which reuses CustomerResource)
      * doesn't pay for two extra queries per row.
      */
-    public function show(Customer $customer)
+    public function show(Request $request, Customer $customer)
     {
+        $user = $request->user();
+
+        abort_if(
+            $this->isViewOnly($user) && ! $customer->assignments()
+                ->where('employee_id', $user->id)
+                ->where('status', AssignmentStatus::Active)
+                ->exists(),
+            403
+        );
+
         $sales = $customer->sales()
             ->with(['items.product', 'branch'])
             ->latest('sale_date')
