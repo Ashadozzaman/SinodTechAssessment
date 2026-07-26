@@ -19,12 +19,19 @@ export interface NavItem {
     permission?: string;
 }
 
+export interface GeneralSettings {
+    company_name: string;
+    currency_symbol: string;
+    logo_url: string | null;
+}
+
 export interface SharedData extends PageProps {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    settings: GeneralSettings;
 }
 
 export interface User {

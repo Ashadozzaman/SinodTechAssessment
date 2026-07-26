@@ -42,6 +42,15 @@ technical assessment on top of an existing role-based-auth starter kit.
   entirely via route-level `permission:` middleware (Spatie
   `laravel-permission`), no Policy classes and no ad-hoc role checks in
   controllers.
+- **General Settings (Admin-only)** — `/settings/general` manages the
+  company name, currency symbol, and logo from a single `general_settings`
+  row (`GeneralSetting::current()`), shared globally to every Inertia page
+  and to the invoice PDF/thermal-print/email views via a view composer. The
+  sidebar logo/name and every money amount in Sales and on invoices reflect
+  these settings immediately after saving.
+- **Dark mode by default** — the appearance toggle already existed;
+  first-time visitors (no saved preference) now default to dark instead of
+  following the OS `prefers-color-scheme`.
 
 ### Deliberate Simplifications
 

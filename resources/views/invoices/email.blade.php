@@ -3,7 +3,7 @@
 <head><meta charset="utf-8"></head>
 <body style="font-family: sans-serif; font-size: 14px; color: #111;">
     <p>Hi {{ $sale->customer->name }},</p>
-    <p>Thank you for your purchase at {{ $sale->branch->name }}. Your invoice <strong>{{ $sale->invoice_number }}</strong> is attached.</p>
-    <p>Total: {{ number_format($sale->total_amount, 2) }}</p>
+    <p>Thank you for your purchase at {{ $setting->company_name }} ({{ $sale->branch->name }}). Your invoice <strong>{{ $sale->invoice_number }}</strong> is attached.</p>
+    <p>Total: {{ $setting->currency_symbol }}{{ number_format($sale->total_amount, 2) }}</p>
 </body>
 </html>

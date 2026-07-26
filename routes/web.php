@@ -139,11 +139,20 @@ Route::middleware('auth', 'prevent_back')->group(function () {
     Route::get('sales/search-products', [SaleController::class, 'searchProducts'])
         ->name('sales.search-products')
         ->middleware("permission:sales.create");
+    Route::get('sales/export', [SaleController::class, 'export'])
+        ->name('sales.export')
+        ->middleware("permission:sales.view|sales.create|sales.update|sales.delete");
     Route::resource('sales', SaleController::class)
         ->only(['create', 'store'])
         ->middleware("permission:sales.create");
     Route::resource('sales', SaleController::class)
         ->only(['index', 'show'])
+        ->middleware("permission:sales.view|sales.create|sales.update|sales.delete");
+    Route::get('sales/{sale}/invoice/download', [SaleController::class, 'downloadInvoice'])
+        ->name('sales.invoice.download')
+        ->middleware("permission:sales.view|sales.create|sales.update|sales.delete");
+    Route::get('sales/{sale}/invoice/print', [SaleController::class, 'printInvoice'])
+        ->name('sales.invoice.print')
         ->middleware("permission:sales.view|sales.create|sales.update|sales.delete");
     //** Sales Route End */
 });

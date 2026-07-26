@@ -16,7 +16,7 @@ class DatabaseSeederTest extends TestCase
     {
         $this->seed();
 
-        $this->assertSame(29, Permission::count());
+        $this->assertSame(31, Permission::count());
         $this->assertTrue(Permission::where('name', 'users.view')->exists());
         $this->assertTrue(Permission::where('name', 'roles.delete')->exists());
         $this->assertTrue(Permission::where('name', 'products.view')->exists());
@@ -33,6 +33,8 @@ class DatabaseSeederTest extends TestCase
         $this->assertTrue(Permission::where('name', 'sales.view')->exists());
         $this->assertTrue(Permission::where('name', 'sales.create')->exists());
         $this->assertTrue(Permission::where('name', 'sales.delete')->exists());
+        $this->assertTrue(Permission::where('name', 'settings.view')->exists());
+        $this->assertTrue(Permission::where('name', 'settings.update')->exists());
     }
 
     public function test_seeder_creates_admin_role_with_all_permissions(): void

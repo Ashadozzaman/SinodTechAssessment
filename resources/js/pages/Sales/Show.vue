@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 import { type Sale } from '@/types/models';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 
 defineProps<{
     sale: Sale;
 }>();
+
+const page = usePage<SharedData>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Sales', href: '/sales' },
@@ -21,12 +23,27 @@ const breadcrumbs: BreadcrumbItem[] = [
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex items-center justify-between">
                 <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Invoice {{ sale.invoice_number }}</h1>
-                <Link
-                    :href="route('sales.index')"
-                    class="border-sidebar-border/70 dark:border-sidebar-border rounded-md border px-4 py-2 text-sm hover:bg-purple-200"
-                >
-                    Back
-                </Link>
+                <div class="flex items-center gap-2">
+                    <a
+                        :href="route('sales.invoice.print', sale.id)"
+                        target="_blank"
+                        class="border-sidebar-border/70 dark:border-sidebar-border rounded-md border px-4 py-2 text-sm hover:bg-purple-200"
+                    >
+                        Print
+                    </a>
+                    <a
+                        :href="route('sales.invoice.download', sale.id)"
+                        class="border-sidebar-border/70 dark:border-sidebar-border rounded-md border px-4 py-2 text-sm hover:bg-purple-200"
+                    >
+                        Download
+                    </a>
+                    <Link
+                        :href="route('sales.index')"
+                        class="border-sidebar-border/70 dark:border-sidebar-border rounded-md border px-4 py-2 text-sm hover:bg-purple-200"
+                    >
+                        Back
+                    </Link>
+                </div>
             </div>
 
             <div class="border-sidebar-border/70 dark:border-sidebar-border grid gap-4 rounded-xl border p-6 md:grid-cols-3">
@@ -52,7 +69,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 </div>
                 <div>
                     <div class="text-xs text-gray-500 uppercase">Total</div>
-                    <div class="font-medium">${{ sale.total_amount }}</div>
+                    <div class="font-medium">{{ page.props.settings.currency_symbol }}{{ sale.total_amount }}</div>
                 </div>
             </div>
 
@@ -69,9 +86,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <tbody>
                         <tr v-for="item in sale.items" :key="item.id" class="border-b">
                             <td class="py-2">{{ item.product_name }}</td>
-                            <td class="py-2">${{ item.unit_price }}</td>
+                            <td class="py-2">{{ page.props.settings.currency_symbol }}{{ item.unit_price }}</td>
                             <td class="py-2">{{ item.quantity }}</td>
-                            <td class="py-2">${{ item.subtotal }}</td>
+                            <td class="py-2">{{ page.props.settings.currency_symbol }}{{ item.subtotal }}</td>
                         </tr>
                     </tbody>
                 </table>
