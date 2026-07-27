@@ -1,12 +1,11 @@
 <?php
 
-use App\Models\User;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CustomerAssignmentController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerEngagementController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\KpiLeaderboardController;
 use App\Http\Controllers\LostCustomerController;
@@ -16,15 +15,12 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return redirect()->route(auth()->check() ? 'dashboard' : 'login');
 })->name('home');
 
-Route::get('dashboard', function () {
-    $totalUser = User::get()->count();
-    return Inertia::render('Dashboard', [
-        'totalUser' => $totalUser
-    ]);
-})->middleware(['auth', 'verified', 'prevent_back'])->name('dashboard');
+Route::get('dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'prevent_back'])
+    ->name('dashboard');
 
 Route::middleware('auth', 'prevent_back')->group(function () {
     //** User Route Start */
