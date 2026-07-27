@@ -120,6 +120,52 @@ export interface Engagement {
     triggered_by: string | null;
 }
 
+export interface SalesPeriodSummary {
+    total: number;
+    count: number;
+}
+
+export interface SalesSummary {
+    today: SalesPeriodSummary;
+    weekly: SalesPeriodSummary;
+    monthly: SalesPeriodSummary;
+}
+
+export interface ChartSeries {
+    labels: string[];
+    data: number[];
+}
+
+export interface SalesChart {
+    today: ChartSeries;
+    weekly: ChartSeries;
+    monthly: ChartSeries;
+}
+
+export interface TopProduct {
+    id: number;
+    name: string;
+    quantity_sold: number;
+    revenue: number;
+}
+
+export interface LowStockProduct {
+    id: number;
+    name: string;
+    sku: string;
+    quantity: number;
+}
+
+export interface RecentSale {
+    id: number;
+    invoice_number: string;
+    customer_name: string | null;
+    total_amount: number;
+    status: 'completed' | 'refunded';
+    status_label: string;
+    sale_date: string;
+}
+
 export interface PaginationLink {
     url: string | null;
     label: string;
